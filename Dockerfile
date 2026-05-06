@@ -2,7 +2,7 @@
 FROM node:24-bookworm AS builder
 WORKDIR /app
 
-# This line installs git so npm can download your proxy parts
+# This installs the missing git tool and other essentials
 RUN apt-get update && apt-get install -y \
     git \
     python3 \
@@ -26,7 +26,7 @@ COPY --from=builder /app/server.js ./server.js
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/dist ./dist
 
-# Sync with Railway settings
+# Match your Railway port settings
 ENV PORT=8080
 EXPOSE 8080
 
