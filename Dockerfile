@@ -1,8 +1,8 @@
-# Stage 1: Build
+# Stage 1: Build (The "Kitchen")
 FROM node:24-bookworm AS builder
 WORKDIR /app
 
-# This installs the missing git tool and other essentials
+# Installs git and building tools
 RUN apt-get update && apt-get install -y \
     git \
     python3 \
@@ -17,16 +17,14 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# Stage 2: Run
+# Stage 2: Run (The "Table")
 FROM node:24-slim
 WORKDIR /app
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/server.js ./server.js
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/dist ./dist
 
-# Match your Railway port settings
+# Grab EVERY file from the builder stage to ensure masqr.js is there
+COPY --from=builder /app ./
+
+# Ensure Railway connects to the right port
 ENV PORT=8080
 EXPOSE 8080
 
