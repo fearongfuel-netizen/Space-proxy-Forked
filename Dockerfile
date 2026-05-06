@@ -4,8 +4,9 @@ FROM node:24-bookworm AS builder
 # 设置工作目录
 WORKDIR /app
 
-# 安装编译原生模块所需的系统依赖 (解决 wisp, libcurl 报错)
+# 安装编译原生模块所需的系统依赖 (Added git to fix the spawn error)
 RUN apt-get update && apt-get install -y \
+    git \
     python3 \
     make \
     g++ \
@@ -38,9 +39,9 @@ COPY --from=builder /app/public ./public
 # 关键：将构建好的 dist 文件夹也复制过来
 COPY --from=builder /app/dist ./dist
 
-# 强制程序在 Koyeb 指定的 2345 端口运行
-ENV PORT=2345
-EXPOSE 2345
+# 这里的 PORT 建议改为使用变量，以便 Railway 自动识别
+ENV PORT=8080
+EXPOSE 8080
 
 # 最终启动命令
 CMD ["node", "server.js"]
